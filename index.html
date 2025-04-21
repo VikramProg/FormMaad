@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multi-Answer Form</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    .question { margin-bottom: 20px; }
+    .answers { margin-top: 10px; }
+    textarea { display: block; margin: 5px 0; width: 100%; }
+  </style>
+</head>
+<body>
+
+  <h2>Answer the Questions</h2>
+  <form id="qaForm">
+    <div class="question" data-id="1">
+      <label>1. What are your hobbies?</label>
+      <div class="answers">
+        <textarea></textarea>
+      </div>
+      <button type="button" onclick="addAnswer(this)">Add another answer</button>
+    </div>
+
+    <div class="question" data-id="2">
+      <label>2. Describe your education background.</label>
+      <div class="answers">
+        <textarea></textarea>
+      </div>
+      <button type="button" onclick="addAnswer(this)">Add another answer</button>
+    </div>
+
+    <div class="question" data-id="3">
+      <label>3. List your favorite books.</label>
+      <div class="answers">
+        <textarea></textarea>
+      </div>
+      <button type="button" onclick="addAnswer(this)">Add another answer</button>
+    </div>
+
+    <div class="question" data-id="4">
+      <label>4. What programming languages do you know?</label>
+      <div class="answers">
+        <textarea></textarea>
+      </div>
+      <button type="button" onclick="addAnswer(this)">Add another answer</button>
+    </div>
+
+    <div class="question" data-id="5">
+      <label>5. Share any interesting experiences.</label>
+      <div class="answers">
+        <textarea></textarea>
+      </div>
+      <button type="button" onclick="addAnswer(this)">Add another answer</button>
+    </div>
+
+    <br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h3>Resulting JSON</h3>
+  <pre id="result"></pre>
+
+  <script>
+    function addAnswer(button) {
+      const answersDiv = button.previousElementSibling;
+      const newTextarea = document.createElement('textarea');
+      answersDiv.appendChild(newTextarea);
+    }
+
+    document.getElementById('qaForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const questions = document.querySelectorAll('.question');
+      const result = {};
+
+      questions.forEach((q, index) => {
+        const key = q.querySelector('label').innerText;
+        const textareas = q.querySelectorAll('textarea');
+        result[`Q${index + 1}`] = {
+          question: key,
+          answers: Array.from(textareas).map(t => t.value).filter(v => v.trim() !== '')
+        };
+      });
+
+      const jsonStr = JSON.stringify(result, null, 2);
+      document.getElementById('result').textContent = jsonStr;
+
+      // Optionally allow download
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'responses.json';
+      a.textContent = "Download responses.json";
+      document.getElementById('result').appendChild(document.createElement('br'));
+      document.getElementById('result').appendChild(a);
+    });
+  </script>
+
+</body>
+</html>
