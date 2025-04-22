@@ -2,99 +2,195 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Trip to Kedarnath - Places</title>
+  <title>Trip to Kedarnath - Step by Step</title>
   <style>
-    body { font-family: Arial; margin: 20px; }
-    .question { margin-bottom: 20px; }
-    .answers { margin-top: 10px; }
-    textarea { display: block; margin: 5px 0; width: 100%; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f4f4f4;
+    }
+    .step {
+      display: none;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .step.active {
+      display: block;
+    }
+    .answer-pair {
+      margin-bottom: 15px;
+    }
+    input[type="text"] {
+      width: 48%;
+      margin: 5px 1%;
+      padding: 8px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #result {
+      white-space: pre-wrap;
+      background-color: #eee;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
 
-  <h2>Add places to visit - Add mulitple places</h2>
+  <h2>Trip to Kedarnath - Add Places Step by Step</h2>
   <form id="qaForm">
-    <div class="question" data-id="1">
-      <label>Places to visit in Dehradun?</label>
+
+    <div class="step active" data-step="1">
+      <h3>Step 1: Places to visit in Dehradun</h3>
       <div class="answers">
-        <textarea></textarea>
+        <div class="answer-pair">
+          <input type="text" placeholder="Place Name">
+          <input type="text" placeholder="Place Link">
+        </div>
       </div>
       <button type="button" onclick="addAnswer(this)">Add another place</button>
+      <br>
+      <button type="button" onclick="nextStep()">Next</button>
     </div>
 
-    <div class="question" data-id="2">
-      <label>Places to visit in Mussoorie?</label>
+    <div class="step" data-step="2">
+      <h3>Step 2: Places to visit in Mussoorie</h3>
       <div class="answers">
-        <textarea></textarea>
+        <div class="answer-pair">
+          <input type="text" placeholder="Place Name">
+          <input type="text" placeholder="Place Link">
+        </div>
       </div>
       <button type="button" onclick="addAnswer(this)">Add another place</button>
+      <br>
+      <button type="button" onclick="nextStep()">Next</button>
     </div>
 
-    <div class="question" data-id="3">
-      <label>Places to visit in Rishikesh?</label>
+    <div class="step" data-step="3">
+      <h3>Step 3: Places to visit in Rishikesh</h3>
       <div class="answers">
-        <textarea></textarea>
+        <div class="answer-pair">
+          <input type="text" placeholder="Place Name">
+          <input type="text" placeholder="Place Link">
+        </div>
       </div>
       <button type="button" onclick="addAnswer(this)">Add another place</button>
+      <br>
+      <button type="button" onclick="nextStep()">Next</button>
     </div>
 
-    <div class="question" data-id="4">
-      <label>Places to visit in Kedarnath?</label>
+    <div class="step" data-step="4">
+      <h3>Step 4: Places to visit in Kedarnath</h3>
       <div class="answers">
-        <textarea></textarea>
+        <div class="answer-pair">
+          <input type="text" placeholder="Place Name">
+          <input type="text" placeholder="Place Link">
+        </div>
       </div>
       <button type="button" onclick="addAnswer(this)">Add another place</button>
+      <br>
+      <button type="button" onclick="nextStep()">Next</button>
     </div>
 
-    <div class="question" data-id="5">
-      <label>Places to visit in Delhi?</label>
+    <div class="step" data-step="5">
+      <h3>Step 5: Places to visit in Delhi</h3>
       <div class="answers">
-        <textarea></textarea>
+        <div class="answer-pair">
+          <input type="text" placeholder="Place Name">
+          <input type="text" placeholder="Place Link">
+        </div>
       </div>
       <button type="button" onclick="addAnswer(this)">Add another place</button>
+      <br>
+      <button type="button" onclick="nextStep()">Next</button>
     </div>
 
-    <br>
-    <button type="submit">Generate Json</button>
+    <div class="step" data-step="6">
+      <h3>Final Step: Generate and Send to Admin</h3>
+      <button type="submit">Generate JSON</button>
+      <button type="button" onclick="sendToAdmin()">Send to Admin</button>
+      <pre id="result"></pre>
+    </div>
   </form>
 
-  <h3>Resulting JSON</h3>
-  <pre id="result"></pre>
-
   <script>
+    let currentStep = 0;
+    let latestJson = '';
+
+    const steps = document.querySelectorAll('.step');
+
+    function showStep(index) {
+      steps.forEach((step, i) => {
+        step.classList.toggle('active', i === index);
+      });
+      currentStep = index;
+    }
+
+    function nextStep() {
+      if (currentStep < steps.length - 1) {
+        showStep(currentStep + 1);
+      }
+    }
+
     function addAnswer(button) {
       const answersDiv = button.previousElementSibling;
-      const newTextarea = document.createElement('textarea');
-      answersDiv.appendChild(newTextarea);
+      const newPair = document.createElement('div');
+      newPair.classList.add('answer-pair');
+      newPair.innerHTML = `
+        <input type="text" placeholder="Place Name">
+        <input type="text" placeholder="Place Link">
+      `;
+      answersDiv.appendChild(newPair);
     }
 
     document.getElementById('qaForm').addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const questions = document.querySelectorAll('.question');
       const result = {};
+      const allSteps = document.querySelectorAll('.step');
 
-      questions.forEach((q, index) => {
-        const key = q.querySelector('label').innerText;
-        const textareas = q.querySelectorAll('textarea');
+      allSteps.forEach((step, index) => {
+        const questionHeader = step.querySelector('h3');
+        if (!questionHeader || index === allSteps.length - 1) return;
+
+        const key = questionHeader.innerText;
+        const pairs = step.querySelectorAll('.answer-pair');
+        const answers = Array.from(pairs).map(pair => {
+          const inputs = pair.querySelectorAll('input');
+          const name = inputs[0].value.trim();
+          const link = inputs[1].value.trim();
+          return name && link ? { name, link } : null;
+        }).filter(ans => ans !== null);
+
         result[`Q${index + 1}`] = {
           question: key,
-          answers: Array.from(textareas).map(t => t.value).filter(v => v.trim() !== '')
+          answers: answers
         };
       });
 
-      const jsonStr = JSON.stringify(result, null, 2);
-      document.getElementById('result').textContent = jsonStr;
-
-      // Optionally allow download
-      const blob = new Blob([jsonStr], { type: "application/json" });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'responses.json';
-      a.textContent = "Download responses.json";
-      document.getElementById('result').appendChild(document.createElement('br'));
-      document.getElementById('result').appendChild(a);
+      latestJson = JSON.stringify(result, null, 2);
+      document.getElementById('result').textContent = latestJson;
     });
+
+    function sendToAdmin() {
+      if (!latestJson) {
+        alert("Please generate the JSON first.");
+        return;
+      }
+      const subject = encodeURIComponent("Places to Visit - Trip to Kedarnath");
+      const body = encodeURIComponent(latestJson);
+      const mailtoLink = `mailto:vikramsinghtomar@yahoo.com?subject=${subject}&body=${body}`;
+      window.location.href = mailtoLink;
+    }
+
+    showStep(0);
   </script>
 
 </body>
