@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Trip to Kedarnath - Step by Step</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -175,22 +177,40 @@
         };
       });
 
-      latestJson = JSON.stringify(result, null, 2);
-      document.getElementById('result').textContent = latestJson;
+      window.latestJson = JSON.stringify(result, null, 2);
+      document.getElementById('result').textContent = window.latestJson;
     });
 
-    function sendToAdmin() {
-      if (!latestJson) {
-        alert("Please generate the JSON first.");
-        return;
-      }
-      const subject = encodeURIComponent("Places to Visit - Trip to Kedarnath");
-      const body = encodeURIComponent(latestJson);
-      const mailtoLink = `mailto:vikramsinghtomar@yahoo.com?subject=${subject}&body=${body}`;
-      window.location.href = mailtoLink;
-    }
+  
 
     showStep(0);
+
+
+ 
+
+
+
+
+ // Initialize EmailJS
+  emailjs.init("SRXlzAWR2qcLRpVF9");
+
+  function sendToAdmin() {
+  if (!window.latestJson) {
+    alert("Please generate the JSON first.");
+    return;
+  } else {
+    emailjs.send("service_oj27719", "template_lanvfkr", {
+      to_email: "vikramsinghtomar@yahoo.com",
+      user_response: window.latestJson
+    }).then(function () {
+      alert("Email sent with JSON download link!");
+    }, function (error) {
+      console.error("EmailJS Error:", error);
+      alert("Failed to send email.");
+    });
+}
+ 
+}
   </script>
 
 </body>
